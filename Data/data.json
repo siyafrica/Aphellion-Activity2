@@ -1,0 +1,72 @@
+var chartData = [
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1188,
+				"newSchools": 0,
+				"startDate": "12/1/2012",
+				"endDate": "2/28/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1237,
+				"newSchools": 49,
+				"startDate": "3/1/2013",
+				"endDate": "5/31/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1287,
+				"newSchools": 50,
+				"startDate": "12/1/2012",
+				"endDate": "2/28/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1338,
+				"newSchools": 51,
+				"startDate": "3/1/2013",
+				"endDate": "5/31/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1390,
+				"newSchools": 52,
+				"startDate": "3/1/2013",
+				"endDate": "5/31/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1443,
+				"newSchools": 53,
+				"startDate": "6/1/2013",
+				"endDate": "8/31/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1497,
+				"newSchools": 54,
+				"startDate": "6/1/2013",
+				"endDate": "8/31/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1553,
+				"newSchools": 56,
+				"startDate": "9/1/2013",
+				"endDate": "11/30/2013"
+			}, 
+				{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 1611,
+				"newSchools": 58,
+				"startDate": "9/1/2013",
+				"endDate": "11/30/2013"
+			},
+			{
+				"ProjectCode": "PRJ2.1",
+				"numberOfSchools": 2000,
+				"newSchools": 389,
+				"startDate": "9/1/2016",
+				"endDate": "11/30/2016"
+			}
+				]
