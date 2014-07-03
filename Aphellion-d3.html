@@ -1,0 +1,326 @@
+<!Doctype  html>
+	<html>
+		<head>
+			<title>D3 bar and line chart for Aphellion</title>
+			<meta charset="utf-8">
+			<script type="text/javascript" src="js/d3.v3.js"></script>
+			<script type="text/javascript" src="js/bootstrap.js"></script>
+
+			<link rel="stylesheet" type="screen" href="css/bootstrap.css">
+			<style type="text/css">
+				/* the style for the page and charts goes here */
+				.axis {
+					font: 10px sans-serif;
+				}
+
+				.axis path
+				.axis line {
+					fill: none;
+					stroke: #000;
+					shape-rendering: crispEdges;
+
+				}
+
+				.rect:hover {
+				fill: orange;
+			}
+			
+			#tooltip {
+				background-color: white;
+				-webkit-border-radius: 10px;
+				-moz-border-radius: 10px;
+				border-radius: 10px;
+				-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				pointer-events: none;
+			}
+			
+			#tooltip.hidden {
+				display: none;
+			}
+			
+			#tooltip p {
+				margin: 0;
+				font-family: sans-serif;
+				font-size: 16px;
+				line-height: 20px;
+			}
+
+			.row {
+				padding-left: 20px;
+			}
+
+			</style>
+
+		</head>
+		<body>
+			<div class="row">
+				<header class="span12">
+					<h1>Aphellion Activity 2 - Bar Charts + Table</h1>
+                		<h3>
+                	The goal of this activity is generate two charts. The charts will be a mix
+                	of a bar graph and a line chart. Both charts were made with D3js.
+                		</h3>
+				</header>
+			</div>
+			<div class="row">
+				<div id="barChart" class="span12"></div>
+			</div>
+			<div class="row">
+				<div id="lineChart" class="span12"></div>
+			</div>
+			
+			<script type="text/javascript">
+			"Use strict"
+
+				//The script for the bar chart and line charts goes here
+				var margin = {top: 20, right: 20, bottom: 70, left: 40},
+					width = 600 - margin.left - margin.right,
+					height = 300 - margin.top - margin.bottom
+					barPadding = 3;
+
+				//parse the date / time
+				var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+				//set up the scales
+				var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
+				var y = d3.scale.linear().range([height, 0]); 
+
+				//set up the axis
+				var xAxis = d3.svg.axis()
+							.scale(x)
+							.orient("bottom")
+							.tickFormat(d3.time.format("%Y-%m"));
+
+				var yAxis = d3.svg.axis()
+							.scale(y)
+							.orient("left")
+							.ticks(5);
+
+				var barChart = d3.select("#barChart")
+								.append("svg")
+								.attr("class", "barChart")
+								.attr("width", width + margin.left + margin.right)
+								.attr("height", height + margin.top + margin.bottom)
+							.append("g")
+								.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+				var lineChart = d3.select("#lineChart")
+								.append("svg")
+								.attr("class", "lineChart")
+								.attr("width", width + margin.left + margin.right)
+								.attr("height", height + margin.top + margin.bottom)
+							.append("g")
+								.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+				var schoolsLine = d3.svg.line()
+									.x(function(d) {return x(d.date);})
+									.y(function(d) {return y(d.numberOfSchools);});
+
+
+
+				d3.csv("Data/data.csv", function(error, data) {
+						data.forEach(function(d) {
+							d.date = parseDate(d.date.toString());
+							d.numberOfSchools = +d.numberOfSchools;
+						});
+
+						x.domain(data.map(function(d) {return d.date;}));
+						y.domain([0, d3.max(data, function(d) {return d.numberOfSchools;})]);
+
+
+						barChart.append("g")
+							.attr("class", "x axis")
+							.attr("transform", "translate(0," + height + ")")
+							.call(xAxis)
+						.selectAll("text")
+							.style("text-anchor", "end")
+							.attr("dx", "-.8em")
+							.attr("dy", "-.55em")
+							.attr("transform", "rotate(-90)");
+
+						barChart.append("g")
+							.attr("class", "y axis")
+							.call(yAxis)
+						.append("text")
+							.attr("transform", "rotate(-90)")
+							.attr("y", 6)
+							.attr("dy", ".71em")
+							.style("text-anchor", "end")
+							.text("Schools");
+
+						barChart.selectAll("bar")
+							.data(data)
+							.enter()
+							.append("rect")
+							.style("fill", function(d) {
+								if(d.numberOfSchools < 1200) {
+									return "#ff0000";
+								} else if (d.numberOfSchools === 2000) {
+									return "#33cc33";
+								} else {return "steelblue";}
+							})
+							.attr("class", "rect")
+							.attr("x", function(d) {return x(d.date);})
+							.attr("width", x.rangeBand() - barPadding)
+							.attr("y", function(d) {return y(d.numberOfSchools);})
+							.attr("height", function(d) {return height - y(d.numberOfSchools);})
+							.on("mouseover", function(d) {
+
+							//Get this bar's x/y values, then augment for the tooltip
+							var xPosition = parseFloat(d3.select(this).attr("x")) + x.rangeBand() / 2;
+							var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+
+							//Create the tooltip label
+							barChart.append("text")
+					   			.attr("id", "tooltip")
+					   			.attr("x", xPosition)
+					   			.attr("y", yPosition)
+					   			.attr("text-anchor", "middle")
+					   			.attr("font-family", "sans-serif")
+					   			.attr("font-size", "11px")
+					   			.attr("font-weight", "bold")
+					   			.attr("fill", "black")
+					   			.text(d.numberOfSchools + " current schools.");
+
+			   					})
+			   				.on("mouseout", function() {
+			   
+							//Remove the tooltip
+							d3.select("#tooltip").remove();
+					
+			   				});
+
+			   				//Draw the circles
+			   				barChart.selectAll("circle")
+			   						.data(data)
+			   						.enter()
+			   						.append("circle")
+			   							.attr("cx", function(d){return x(d.date)})
+			   							.attr("cy", function(d){return y(d.numberOfSchools)})
+			   							.attr("r", function(d){
+			   								if (d.newSchools <= 0) { return 0;}
+			   								else {return 5};
+			   							});
+
+			   				barChart.selectAll("text")
+			   					.data(data)
+			   					.enter()
+			   					.append("text")
+			   					.text(function(d) {
+			   						return d.numberOfSchools;
+			   					})
+			   					.attr("x", function(d) {return x(d.date);})
+			   					.attr("y", function(d) {return y(d.numberOfSchools);});
+			 })
+			
+			//the fixed interloper with phoney values
+			d3.csv("Data/data2.csv", function(error, data) {
+						data.forEach(function(d) {
+							d.date = parseDate(d.date.toString());
+							d.numberOfSchools = +d.numberOfSchools;
+						});
+						barChart.append("path")
+			   					.attr("d", schoolsLine(data))
+			   					.attr("class", "line")
+			   					.style("fill", "none")
+								.style("stroke", "#000000")
+								.style("stroke-dasharray", ("3,3"));
+					})
+					
+		//Draw the line chart
+		d3.csv("Data/data2.csv", function(error, data) {
+			data.forEach(function(d) {
+				d.date = parseDate(d.date.toString());
+				d.numberOfSchools = +d.numberOfSchools;
+			});
+
+			x.domain(data.map(function(d) {return d.date;}));
+			y.domain([0, d3.max(data, function(d) {return d.numberOfSchools;})]);
+
+						//X Axis
+						lineChart.append("g")
+							.attr("class", "x axis")
+							.attr("transform", "translate(0," + height + ")")
+							.call(xAxis)
+						.selectAll("text")
+							.style("text-anchor", "end")
+							.attr("dx", "-.8em")
+							.attr("dy", "-.55em")
+							.attr("transform", "rotate(-90)");
+
+						//Y Axis
+						lineChart.append("g")
+							.attr("class", "y axis")
+							.call(yAxis)
+						.append("text")
+							.attr("transform", "rotate(-90)")
+							.attr("y", 6)
+							.attr("dy", ".71em")
+							.style("text-anchor", "end")
+							.text("Schools");
+
+						//Line
+						lineChart.append("path")
+								.attr("d", schoolsLine(data))
+								.attr("class", "numberOfSchools")
+								.style("fill", "none")
+								.style("stroke", "#000000")
+								.style("stroke-dasharray", ("3,3"));
+
+		})
+
+		//draw the circles
+		d3.csv("Data/data.csv", function(error, data) {
+			data.forEach(function(d) {
+				d.date = parseDate(d.date.toString());
+				d.numberOfSchools = +d.numberOfSchools;
+			});
+
+						lineChart.selectAll("circle")
+			   						.data(data)
+			   						.enter()
+			   						.append("circle")
+			   							.attr("cx", function(d){return x(d.date)})
+			   							.attr("cy", function(d){return y(d.numberOfSchools)})
+			   							.attr("r", function(d){
+			   								if (d.newSchools <= 0) { return 0;}
+			   								else {return 5};
+			   							})
+			   							.on("mouseover", function(d) {
+
+							//Get this bar's x/y values, then augment for the tooltip
+							var xPosition = parseFloat(d3.select(this).attr("x")) + x.rangeBand() / 2;
+							var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+
+							//Create the tooltip label
+							barChart.append("text")
+					   			.attr("id", "tooltip")
+					   			.attr("x", xPosition)
+					   			.attr("y", yPosition)
+					   			.attr("text-anchor", "top")
+					   			.attr("font-family", "sans-serif")
+					   			.attr("font-size", "11px")
+					   			.attr("font-weight", "bold")
+					   			.attr("fill", "black")
+					   			.text(d.numberOfSchools + " current schools.");
+
+			   					})
+			   				.on("mouseout", function() {
+			   
+							//Remove the tooltip
+							d3.select("#tooltip").remove();
+					
+			   				});
+		})
+
+
+		console.log("This code works");
+
+			</script>
+		</body>
+
+
+	</html>
